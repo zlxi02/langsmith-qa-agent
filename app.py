@@ -7,6 +7,7 @@ from langchain_core.tools import Tool
 import openai
 from openai import OpenAI
 from docs_urls import LANGSMITH_DOC_URLS
+from agent import create_agent
 
 def setup_vector_store():
     """
@@ -131,11 +132,14 @@ if __name__ == "__main__":
     print("="*60)
     print(f"\nThe 'langsmith_retriever_tool' is ready for use in the agent.")
     
-    # Test the retriever with sample queries
+    # Create the 3-node agent
     print("\n" + "="*60)
-    print("TESTING RETRIEVER")
+    print("STEP 2: CREATING & TESTING 3-NODE AGENT")
     print("="*60 + "\n")
     
+    agent = create_agent(tool)
+    
+    # Test the agent with sample queries
     test_queries = [
         "How does LangSmith tracing work?",
         "What is LangSmith evaluation?",
@@ -143,14 +147,17 @@ if __name__ == "__main__":
     ]
     
     for query in test_queries:
-        print(f"📝 Query: {query}")
-        print("-" * 60)
-        result = tool.func(query)
-        # Show first 200 characters of the result
-        preview = result[:200] + "..." if len(result) > 200 else result
-        print(f"📄 Retrieved content:\n{preview}\n")
+        print(f"\n{'='*60}")
+        print(f"🔄 Processing Query: {query}")
+        print('='*60 + "\n")
+        
+        # Invoke the agent (goes through all 3 nodes)
+        result = agent.invoke({"question": query})
+        
+        # Print the formatted output
+        print(result["formatted_output"])
     
-    print("="*60)
-    print("✅ RAG SYSTEM WORKING! Ready for Step 2.")
+    print("\n" + "="*60)
+    print("✅ 3-NODE AGENT WORKING! Step 2 Complete.")
     print("="*60)
 
