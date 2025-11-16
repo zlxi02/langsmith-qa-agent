@@ -50,19 +50,34 @@ def setup_vector_store():
     gateway_headers = {"X-Api-Key": os.getenv("X_API_KEY")}
     
     # Create both sync and async clients with gateway configuration
+    # Important: We create custom HTTP clients with the headers baked in
+    import httpx
+    
+    http_client = httpx.Client(
+        base_url=gateway_base_url,
+        headers=gateway_headers,
+        timeout=60.0
+    )
+    
+    async_http_client = httpx.AsyncClient(
+        base_url=gateway_base_url,
+        headers=gateway_headers,
+        timeout=60.0
+    )
+    
     sync_client = OpenAI(
         base_url=gateway_base_url,
         api_key="dummy",
-        default_headers=gateway_headers
+        http_client=http_client
     )
     
     async_client = AsyncOpenAI(
         base_url=gateway_base_url,
         api_key="dummy",
-        default_headers=gateway_headers
+        http_client=async_http_client
     )
     
-    # Pass embeddings clients (not the full client) to OpenAIEmbeddings
+    # Pass embeddings clients to OpenAIEmbeddings
     embeddings = OpenAIEmbeddings(
         client=sync_client.embeddings,
         async_client=async_client.embeddings,
@@ -89,7 +104,7 @@ def setup_vector_store():
         description="Retrieves relevant information from LangSmith documentation. "
                     "Use this tool when you need to answer questions about LangSmith features, "
                     "such as tracing, evaluation, or other capabilities.",
-        func=lambda query: "\n\n".join([doc.page_content for doc in retriever.get_relevant_documents(query)])
+        func=lambda query: "\n\n".join([doc.page_content for doc in retriever.invoke(query)])
     )
     
     print(f"✓ Created langsmith_retriever_tool")
