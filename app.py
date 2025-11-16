@@ -115,4 +115,27 @@ if __name__ == "__main__":
     print("INGESTION COMPLETE!")
     print("="*60)
     print(f"\nThe 'langsmith_retriever_tool' is ready for use in the agent.")
+    
+    # Test the retriever with sample queries
+    print("\n" + "="*60)
+    print("TESTING RETRIEVER")
+    print("="*60 + "\n")
+    
+    test_queries = [
+        "How does LangSmith tracing work?",
+        "What is LangSmith evaluation?",
+        "How do I deploy agents with LangSmith?"
+    ]
+    
+    for query in test_queries:
+        print(f"📝 Query: {query}")
+        print("-" * 60)
+        result = tool.func(query)
+        # Show first 200 characters of the result
+        preview = result[:200] + "..." if len(result) > 200 else result
+        print(f"📄 Retrieved content:\n{preview}\n")
+    
+    print("="*60)
+    print("✅ RAG SYSTEM WORKING! Ready for Step 2.")
+    print("="*60)
 

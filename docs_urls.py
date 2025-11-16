@@ -1,27 +1,33 @@
 """
 LangSmith Documentation URLs to scrape for the RAG knowledge base.
 Add or remove URLs as needed to customize the agent's knowledge.
+
+Updated to use the current LangSmith documentation structure at:
+https://docs.langchain.com/langsmith/
 """
 
 LANGSMITH_DOC_URLS = [
-    # Getting Started
-    "https://docs.smith.langchain.com/",
+    # Home / Overview
+    "https://docs.langchain.com/langsmith/home",
     
-    # Tracing
-    "https://docs.smith.langchain.com/observability/how_to_guides/tracing",
-    "https://docs.smith.langchain.com/observability/concepts/tracing",
+    # Quickstarts (Main Getting Started Guides)
+    "https://docs.langchain.com/langsmith/observability-quickstart",
+    "https://docs.langchain.com/langsmith/evaluation-quickstart",
+    "https://docs.langchain.com/langsmith/prompt-engineering-quickstart",
+    "https://docs.langchain.com/langsmith/quick-start-studio",
     
-    # Evaluation
-    "https://docs.smith.langchain.com/evaluation/how_to_guides/evaluation",
-    "https://docs.smith.langchain.com/evaluation/concepts",
+    # Core Features
+    "https://docs.langchain.com/langsmith/observability",
+    "https://docs.langchain.com/langsmith/evaluation",
+    "https://docs.langchain.com/langsmith/prompt-engineering",
+    "https://docs.langchain.com/langsmith/deployments",
     
-    # Datasets
-    "https://docs.smith.langchain.com/evaluation/how_to_guides/datasets",
+    # Platform & Setup
+    "https://docs.langchain.com/langsmith/platform-setup",
+    "https://docs.langchain.com/langsmith/create-account-api-key",
     
-    # Monitoring
-    "https://docs.smith.langchain.com/observability/how_to_guides/monitoring",
-    
-    # API Reference
-    "https://docs.smith.langchain.com/api_reference",
+    # Additional Topics
+    "https://docs.langchain.com/langsmith/datasets",
+    "https://docs.langchain.com/langsmith/monitoring",
+    "https://docs.langchain.com/langsmith/testing",
 ]
-
