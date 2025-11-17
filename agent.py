@@ -12,6 +12,7 @@ from typing import TypedDict, Optional
 from langgraph.graph import StateGraph, END
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.runnables import RunnableLambda
 from openai import OpenAI, AsyncOpenAI
 import httpx
 
@@ -193,17 +194,25 @@ def create_agent(retriever_tool_instance):
     
     print("   ✓ Added 3 nodes: retrieve → generate → format")
     
-    # Compile the graph with metadata for better LangSmith tracing
-    agent = workflow.compile()
+    # Compile the graph
+    compiled_graph = workflow.compile()
     
-    # Add run name for LangSmith tracing
+    # Wrap to extract just the formatted_output for cleaner API responses
+    def agent_wrapper(input_dict):
+        """Execute agent and return just the formatted output"""
+        result = compiled_graph.invoke(input_dict)
+        # Return just the formatted_output as a simple string response
+        return {"output": result["formatted_output"]}
+    
+    # Convert to Runnable with proper input schema for playground
+    agent = RunnableLambda(agent_wrapper).with_types(
+        input_type=GraphState
+    )
+    
+    # Add configuration for better LangSmith tracing
     agent = agent.with_config({
         "run_name": "LangSmith Q&A Agent",
-        "tags": ["langsmith-qa", "3-node-agent", "rag"],
-        "metadata": {
-            "agent_type": "langgraph",
-            "nodes": ["retrieve", "generate", "format"]
-        }
+        "tags": ["langsmith-qa", "3-node-agent", "rag"]
     })
     
     print("   ✓ Agent compiled and ready!\n")
