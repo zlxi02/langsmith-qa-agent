@@ -4,35 +4,35 @@ A production-ready Retrieval-Augmented Generation (RAG) system built with LangGr
 
 ## Overview
 
-This project demonstrates a complete RAG pipeline with enterprise-grade features:
-- **Semantic search** over live documentation using FAISS vector store
-- **Stateful agent architecture** with LangGraph's 3-node execution flow
-- **REST API** with streaming support via LangServe
-- **Full observability** with LangSmith tracing integration
-- **Custom gateway integration** using Salesforce's OpenAI Gateway
+A production-ready Q&A agent demonstrating key LangChain/LangGraph patterns:
+
+- **3-Node LangGraph Agent**: Sequential pipeline with Retrieve → Generate → Format nodes for clear separation of concerns and observability
+- **RAG System**: Built on LangChain's document loaders, text splitters, embeddings, and FAISS vector store for semantic search
+- **LangSmith & LangServe**: Full observability with tracing, plus REST API deployment with streaming support and interactive playground
+- **Custom Gateway**: Salesforce OpenAI Gateway integration with custom authentication headers and base URL configuration
 
 ### Architecture Diagram
 
 ```
 User Query → [API/Playground] → LangGraph Agent → LangSmith (Tracing)
-                                      ↓
-                              Retrieve Node
-                                      ↓
-                                 FAISS Index
-                             (cosine similarity)
-                                      ↓
-                            Doc Chunks (top 3)
-                                      ↓
-                              Generate Node
-                                      ↓
-                      ChatOpenAI (GPT-4o-mini)
-                      Question + Doc Context
-                                      ↓
-                            Generated Answer
-                                      ↓
-                              Format Node
-                                      ↓
-                          Formatted Output
+                                        ↓
+                                  Retrieve Node
+                                        ↓
+                                   FAISS Index
+                                (cosine similarity)
+                                        ↓
+                               Doc Chunks (top 3)
+                                        ↓
+                                  Generate Node
+                                        ↓
+                            ChatOpenAI (GPT-4o-mini)
+                             Question + Doc Context
+                                        ↓
+                                 Generated Answer
+                                        ↓
+                                   Format Node
+                                        ↓
+                               Formatted Output
 ```
 
 **Flow:** Sequential execution (retrieve → generate → format)  
