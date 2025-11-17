@@ -16,18 +16,27 @@ This project demonstrates a complete RAG pipeline with enterprise-grade features
 ```
 User Query → [API/Playground] → LangGraph Agent → LangSmith (Tracing)
                                       ↓
-                          ┌───────────┴───────────┐
-                          │                       │
-                     Retrieve Node          Generate Node
-                          ↓                       ↓
-                    FAISS Index            ChatOpenAI (GPT-4o-mini)
-                          ↓                       ↓
-                    Doc Chunks ────────────> Prompt Context
-                          ↓                       ↓
-                     Format Node ←──── Generated Answer
-                          ↓
-                  Formatted Output
+                              Retrieve Node
+                                      ↓
+                                 FAISS Index
+                             (cosine similarity)
+                                      ↓
+                            Doc Chunks (top 3)
+                                      ↓
+                              Generate Node
+                                      ↓
+                      ChatOpenAI (GPT-4o-mini)
+                      Question + Doc Context
+                                      ↓
+                            Generated Answer
+                                      ↓
+                              Format Node
+                                      ↓
+                          Formatted Output
 ```
+
+**Flow:** Sequential execution (retrieve → generate → format)  
+**Total latency:** ~3-4s per query
 
 ## Technical Architecture
 
