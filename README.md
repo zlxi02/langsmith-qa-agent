@@ -148,10 +148,12 @@ pip install -r requirements.txt
 
 ### 2. Environment Variables
 
-**Required:**
+**Required (Custom Gateway):**
 ```bash
 export X_API_KEY='your-salesforce-gateway-api-key'
 ```
+
+> **Note:** This project uses Salesforce's OpenAI Gateway with custom authentication. To use your own enterprise gateway, modify the `base_url` and headers in `utils.py`. To use OpenAI directly instead, replace the custom client configuration with standard LangChain parameters (`openai_api_key` only).
 
 **Recommended (LangSmith Observability):**
 ```bash
