@@ -8,7 +8,7 @@ LangGraph Agent for LangSmith Q&A
 """
 
 import os
-from typing import TypedDict
+from typing import TypedDict, Optional
 from langgraph.graph import StateGraph, END
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -20,15 +20,18 @@ import httpx
 # STEP 1: Define State
 # ==============================================================================
 
-class GraphState(TypedDict):
+class GraphState(TypedDict, total=False):
     """
     State that flows through the agent graph.
     Each node reads from and writes to this state.
     """
-    question: str           # User's query
-    documents: str          # Retrieved documentation chunks
-    answer: str            # Generated answer from LLM
-    formatted_output: str  # Final formatted response
+    question: str           # User's query (REQUIRED - input)
+    documents: str          # Retrieved documentation chunks (output)
+    answer: str            # Generated answer from LLM (output)
+    formatted_output: str  # Final formatted response (output)
+
+# Mark question as required
+GraphState.__required_keys__ = frozenset(['question'])
 
 
 # ==============================================================================
@@ -143,20 +146,8 @@ def formatter_node(state: GraphState) -> dict:
     question = state["question"]
     answer = state["answer"]
     
-    # Format the final output
-    formatted_output = f"""
-╔══════════════════════════════════════════════════════════════╗
-║                    LANGSMITH Q&A AGENT                       ║
-╚══════════════════════════════════════════════════════════════╝
-
-📝 Question:
-{question}
-
-💡 Answer:
-{answer}
-
-══════════════════════════════════════════════════════════════
-"""
+    # Simple format: just the answer
+    formatted_output = answer
     
     print("   Output formatted ✓")
     
@@ -179,7 +170,7 @@ def create_agent(retriever_tool_instance):
         retriever_tool_instance: The Tool object from app.py that wraps FAISS retriever
         
     Returns:
-        Compiled LangGraph agent ready to invoke
+        Compiled LangGraph agent ready to invoke with proper LangSmith tracing
     """
     global retriever_tool
     retriever_tool = retriever_tool_instance
@@ -202,8 +193,18 @@ def create_agent(retriever_tool_instance):
     
     print("   ✓ Added 3 nodes: retrieve → generate → format")
     
-    # Compile the graph
+    # Compile the graph with metadata for better LangSmith tracing
     agent = workflow.compile()
+    
+    # Add run name for LangSmith tracing
+    agent = agent.with_config({
+        "run_name": "LangSmith Q&A Agent",
+        "tags": ["langsmith-qa", "3-node-agent", "rag"],
+        "metadata": {
+            "agent_type": "langgraph",
+            "nodes": ["retrieve", "generate", "format"]
+        }
+    })
     
     print("   ✓ Agent compiled and ready!\n")
     
