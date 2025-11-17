@@ -15,12 +15,12 @@ from openai import OpenAI, AsyncOpenAI
 import httpx
 
 
-def get_gateway_embeddings():
+def create_gateway_clients():
     """
-    Create OpenAI embeddings configured for the company gateway.
+    Create OpenAI sync and async clients configured for the company gateway.
     
     Returns:
-        OpenAIEmbeddings: Configured embeddings instance
+        tuple: (sync_client, async_client) - Configured OpenAI client instances
     """
     # Set dummy OPENAI_API_KEY if not already set (required by OpenAI SDK)
     if not os.getenv("OPENAI_API_KEY"):
@@ -43,6 +43,7 @@ def get_gateway_embeddings():
         timeout=60.0
     )
     
+    # Create OpenAI clients using custom HTTP clients
     sync_client = OpenAI(
         base_url=gateway_base_url,
         api_key="dummy",
@@ -54,6 +55,19 @@ def get_gateway_embeddings():
         api_key="dummy",
         http_client=async_http_client
     )
+    
+    return sync_client, async_client
+
+
+def get_gateway_embeddings():
+    """
+    Create OpenAI embeddings configured for the company gateway.
+    
+    Returns:
+        OpenAIEmbeddings: Configured embeddings instance
+    """
+    # Get gateway clients (shared utility)
+    sync_client, async_client = create_gateway_clients()
     
     # Create embeddings with gateway clients
     embeddings = OpenAIEmbeddings(

@@ -13,8 +13,7 @@ from langgraph.graph import StateGraph, END
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableLambda
-from openai import OpenAI, AsyncOpenAI
-import httpx
+from utils import create_gateway_clients
 
 
 # ==============================================================================
@@ -71,38 +70,8 @@ def generator_node(state: GraphState) -> dict:
     question = state["question"]
     documents = state["documents"]
     
-    # Configure ChatOpenAI to use company gateway
-    # Set dummy OPENAI_API_KEY if not already set
-    if not os.getenv("OPENAI_API_KEY"):
-        os.environ["OPENAI_API_KEY"] = "dummy"
-    
-    gateway_base_url = "https://gateway.salesforceresearch.ai/openai/process/v1"
-    gateway_headers = {"X-Api-Key": os.getenv("X_API_KEY")}
-    
-    # Create custom HTTP clients with gateway configuration
-    http_client = httpx.Client(
-        base_url=gateway_base_url,
-        headers=gateway_headers,
-        timeout=60.0
-    )
-    
-    async_http_client = httpx.AsyncClient(
-        base_url=gateway_base_url,
-        headers=gateway_headers,
-        timeout=60.0
-    )
-    
-    sync_client = OpenAI(
-        base_url=gateway_base_url,
-        api_key="dummy",
-        http_client=http_client
-    )
-    
-    async_client = AsyncOpenAI(
-        base_url=gateway_base_url,
-        api_key="dummy",
-        http_client=async_http_client
-    )
+    # Get gateway clients (shared utility)
+    sync_client, async_client = create_gateway_clients()
     
     # Create LLM with gateway clients
     # Pass the chat.completions subresource, not the full client
